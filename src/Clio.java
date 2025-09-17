@@ -1,6 +1,7 @@
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -9,7 +10,7 @@ import static java.nio.file.StandardOpenOption.*;
 public class Clio {
 
     public static final String FILE_PATH = "clio.txt";
-    Path filePath = Paths.get(FILE_PATH);
+    private final Path filePath = Paths.get(FILE_PATH);
 
     public void processCommand(String input) throws Exception{
         String[] arr = deserialize(input);
@@ -20,9 +21,8 @@ public class Clio {
         String dir = arr[1];
         switch (cmd){
             case "list" :
-
+                listDir();
                 break;
-
             case "add":
                 addDir(dir);
                 break;
@@ -50,7 +50,26 @@ public class Clio {
             int bytesWritten = fc.write(buffer);
             System.out.println("bytes written:" + bytesWritten );
         }catch (IOException e){
-            System.err.println("Something occurred when adding dir\n" + e);
+            System.err.println("Problem occurred  adding dir" );
+            System.out.println(e);
+        }
+    }
+    private void listDir(){
+        try(FileChannel fc = FileChannel.open(filePath, READ)){
+            ByteBuffer buffer = ByteBuffer.allocate(1024);
+            fc.read(buffer);
+
+            buffer.flip();
+            int bufferSize = buffer.remaining();
+            byte[] bytes = new byte[bufferSize];
+
+            buffer.get(bytes); //transfer the data from buffer to the byte array
+
+            String readData = new String(bytes, StandardCharsets.UTF_8);
+            System.out.println(readData);
+        }catch (IOException e){
+            System.err.println("Problem listing saved the directories");
+            System.out.println(e);
         }
     }
 }

@@ -15,7 +15,7 @@ public class Main {
             try{
                 clio.processCommand(command);
             }catch (Exception e){
-                System.err.println(e);
+                System.err.println(e.getMessage());
             }
 
         }
